@@ -72,6 +72,5 @@ jobs:
           HAPI_VERSION=$(grep "val hapiProtoVersion = " settings.gradle.kts | sed -E 's/.+ = "(.+)"/\1/')
           HAPI_MAJOR="$(semver get major ${HAPI_VERSION})"
           HAPI_MINOR="$(semver get minor ${HAPI_VERSION})"
-          echo "Verifying that the tag ${{ github.ref_name }} matches the hapiProtoVersion ${HAPI_VERSION} in settings.gradle.kts"
           echo "Verifying that the tag ${TAG_MAJOR}.${TAG_MINOR} matches the hapiProtoVersion ${HAPI_MAJOR}.${HAPI_MINOR} in settings.gradle.kts"
           test "${TAG_MINOR}" = "${HAPI_MINOR}" && test "${TAG_MINOR}" = "${HAPI_MINOR}"
