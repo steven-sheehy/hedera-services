@@ -30,7 +30,6 @@ defaults:
 jobs:
   prepare-tag-release:
     name: Prepare Release [Tag]
-    runs-on: [self-hosted, Linux, medium, ephemeral]
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
     outputs:
       version: ${{ steps.tag.outputs.version }}
@@ -63,10 +62,11 @@ jobs:
           echo "prerelease=${PRERELEASE_FLAG}" >>"${GITHUB_OUTPUT}"
 
       - name: Verify HAPI version
-        env:
-          TAG: ${{ needs.prepare-tag-release.outputs.version }}
         run: |
-          TAG_MINOR=$(echo "${TAG}" | sed -E 's/v([0-9]+\.[0-9]+).*/\1/')
-          HAPI_VERSION=$(grep "val hapiProtoVersion" settings.gradle.kts | sed -E 's/.+"([0-9]+\.[0-9]+).*"/\1/')
-          echo "Verifying that the tag ${TAG_MINOR} matches the hapiProtoVersion ${HAPI_VERSION} in settings.gradle.kts"
-          test "${TAG_MINOR}" = "${HAPI_VERSION}"
+          TAG_MAJOR="$(semver get major "${{ github.ref_name }}")"
+          TAG_MINOR="$(semver get minor "${{ github.ref_name }}")"
+          HAPI_VERSION=$(grep "val hapiProtoVersion = " settings.gradle.kts | sed -E 's/.+ = "(.+)"/\1/')
+          HAPI_MAJOR="$(semver get major ${HAPI_VERSION})"
+          HAPI_MINOR="$(semver get minor ${HAPI_VERSION})"
+          echo "Verifying that the tag ${{ github.ref_name }} matches the hapiProtoVersion ${HAPI_VERSION} in settings.gradle.kts"
+          test "${TAG_MINOR}" = "${HAPI_MINOR}" && test "${TAG_MINOR}" "${HAPI_MINOR}"
