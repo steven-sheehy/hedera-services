@@ -37,8 +37,6 @@ on:
     branches:
       - develop
       - 'release/**'
-    tags:
-      - 'v*.*.*'
 
 defaults:
   run:
